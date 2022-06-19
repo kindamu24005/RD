@@ -1,0 +1,18 @@
+version: '3'
+services: #サービスの定義
+  db: #一つ目のサービス
+    image: mysql:8.0 #dbサービスのイメージを選択
+    command: --default-authentication-plugin=mysql_native_password #myspl8.0を認証するための設定
+    volumes:
+      - ./src/db/mysql_data:/var/lib/mysql #ローカルのディレクトリ（左）をドッカーのディレクトリ（右）に共有するよ
+    environment: #環境変数の設定
+      MYSQL_ROOT_PASSWARD: password #MYSQL_ROOT_PASSWORDという変数にpasswordを入れる
+  web: #二つ目のサービス
+    build: . #同じディレクトリにいるDockerfileを参照するよ
+    command: bundle exec rails s -p 3000 -b '0.0.0.0' #railsのサーバーを起動させる
+    volumes:
+      - ./src:/app
+    ports:
+      - "3000:3000"
+    depends_on: #2つ目のサービスは一つ目のサービスに接続しています　webサービスからdbサービスに連携できる
+      - db
